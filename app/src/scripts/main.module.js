@@ -17,7 +17,7 @@ export class Main {
         let yScale = 0.05;
         let zScale = 0.05;
 
-        let maxPopulation = 30; //maximum number of visitors;
+        let maxPopulation = 100; //maximum number of visitors;
 
         let updateInterval = 30; //how often to check in on our visitors (miliseconds, i.e. 5 seconds)
 
@@ -42,7 +42,7 @@ export class Main {
         let cubeList = [];
 
         //initialise visitors list
-        for(let i=0; i<20; i++) {
+        for(let i=0; i<maxPopulation; i++) {
 
             luxVisitors.push(new LuxVisitor(
                     getRandomInt(-viewPortWidth, viewPortWidth),
@@ -66,7 +66,7 @@ export class Main {
 
                 for(let i=0; i<luxVisitors.length; i++) {
 
-                    luxVisitors[i].updatePosition(30, 15); //gets new location after 10 seconds elapses
+                    luxVisitors[i].updatePosition(30, 30); //gets new location after 10 seconds elapses
 
                     let locationHistory = luxVisitors[i].getLocationHistory();
                     let latestLocation = locationHistory[locationHistory.length-1];
@@ -77,17 +77,21 @@ export class Main {
 
                     if((correctedX >= -viewPortWidth && correctedX <= viewPortWidth) && (correctedY >= -viewPortHeight && correctedY <= viewPortHeight)) {
 
-                        var geometry = new THREE.BoxGeometry(xScale, yScale);
-                        var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-                        var cube = new THREE.Mesh( geometry, material );
+                        // var geometry = new THREE.PointCloud(xScale, yScale);
+                        // var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+                        // var cube = new THREE.Mesh(geometry, material);
+                        var dotGeometry = new THREE.Geometry();
+                        dotGeometry.vertices.push(new THREE.Vector3(xScale, yScale, 0));
+                        var dotMaterial = new THREE.PointCloudMaterial( { size: 1, sizeAttenuation: false } );
+                        var dot = new THREE.PointCloud( dotGeometry, dotMaterial );
+                        scene.add( dot );
 
                         //corrected x,y for viewport
-                        cube.position.x = latestLocation.x / viewPortWidth;
-                        cube.position.y = latestLocation.y / viewPortHeight;
-
+                        dot.position.x = latestLocation.x / viewPortWidth;
+                        dot.position.y = latestLocation.y / viewPortHeight;
 
                         //push cube to list for rendering
-                        scene.add(cube)
+                        scene.add(dot)
 
                     } else {
                         //else we should remove the luxVisitor (garbage collection)
